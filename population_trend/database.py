@@ -5,7 +5,7 @@ from typing import Iterable
 
 from flask import g
 
-from .config import DATA_DIR, DB_PATH, GLOBAL_SAMPLE_RECORDS, SAMPLE_RECORDS
+from .config import DATA_DIR, DB_PATH, DOMESTIC_POPULATION_RECORDS, GLOBAL_POPULATION_RECORDS
 from .security import hash_password
 
 
@@ -115,27 +115,56 @@ def init_database() -> None:
         )
         connection.executemany(
             """
-            INSERT OR IGNORE INTO population_records (
+            INSERT INTO population_records (
                 region, year, total_population, male_population, female_population,
                 birth_rate, death_rate, natural_growth_rate, aging_rate,
                 urbanization_rate, source, note
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(region, year) DO UPDATE SET
+                total_population = excluded.total_population,
+                male_population = excluded.male_population,
+                female_population = excluded.female_population,
+                birth_rate = excluded.birth_rate,
+                death_rate = excluded.death_rate,
+                natural_growth_rate = excluded.natural_growth_rate,
+                aging_rate = excluded.aging_rate,
+                urbanization_rate = excluded.urbanization_rate,
+                source = excluded.source,
+                note = excluded.note,
+                updated_at = CURRENT_TIMESTAMP
             """,
-            SAMPLE_RECORDS,
+            DOMESTIC_POPULATION_RECORDS,
         )
-        for region, *_ in SAMPLE_RECORDS:
+        for region, *_ in DOMESTIC_POPULATION_RECORDS:
             connection.execute(
-                "INSERT OR IGNORE INTO regions (name, description) VALUES (?, ?)",
-                (region, "系统内置样例地区，可在地区管理中维护。"),
+                """
+                INSERT INTO regions (name, description) VALUES (?, ?)
+                ON CONFLICT(name) DO UPDATE SET
+                    description = excluded.description
+                """,
+                (region, "系统内置地区档案，可在地区管理中维护。"),
             )
         connection.executemany(
             """
-            INSERT OR IGNORE INTO global_population_records (
+            INSERT INTO global_population_records (
                 country, continent, year, total_population, male_population, female_population,
                 birth_rate, death_rate, natural_growth_rate, aging_rate,
                 urbanization_rate, source, note
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(country, year) DO UPDATE SET
+                continent = excluded.continent,
+                total_population = excluded.total_population,
+                male_population = excluded.male_population,
+                female_population = excluded.female_population,
+                birth_rate = excluded.birth_rate,
+                death_rate = excluded.death_rate,
+                natural_growth_rate = excluded.natural_growth_rate,
+                aging_rate = excluded.aging_rate,
+                urbanization_rate = excluded.urbanization_rate,
+                source = excluded.source,
+                note = excluded.note,
+                updated_at = CURRENT_TIMESTAMP
             """,
-            GLOBAL_SAMPLE_RECORDS,
+            GLOBAL_POPULATION_RECORDS,
         )
         connection.commit()

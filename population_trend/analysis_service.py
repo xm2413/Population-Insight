@@ -138,10 +138,10 @@ def get_alerts() -> list[dict]:
             reasons.append(f"老龄化率 {row['aging_rate']}% 已达到深度老龄化关注线")
             level = "较高"
         if row["natural_growth_rate"] < 0:
-            reasons.append(f"自然增长率 {row['natural_growth_rate']}% 为负")
+            reasons.append(f"自然增长率 {row['natural_growth_rate']}‰ 为负")
             level = "较高"
         if row["birth_rate"] < 7:
-            reasons.append(f"出生率 {row['birth_rate']}% 偏低")
+            reasons.append(f"出生率 {row['birth_rate']}‰ 偏低")
         if reasons:
             alerts.append(
                 {

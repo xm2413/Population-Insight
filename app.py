@@ -155,9 +155,9 @@ def dashboard():
     <section class="kpis">
       <article><span>最新年份</span><strong>{{ summary.latest_year or '-' }}</strong></article>
       <article><span>地区数量</span><strong>{{ summary.region_count }}</strong></article>
-      <article><span>样本记录</span><strong>{{ summary.record_count }}</strong></article>
+      <article><span>数据记录</span><strong>{{ summary.record_count }}</strong></article>
       <article><span>最新总人口</span><strong>{{ summary.total_population }}</strong><small>万人</small></article>
-      <article><span>平均自然增长率</span><strong>{{ summary.avg_growth }}%</strong></article>
+      <article><span>平均自然增长率</span><strong>{{ summary.avg_growth }}‰</strong></article>
       <article><span>预警地区</span><strong>{{ summary.high_risk_count }}</strong></article>
     </section>
     <section class="grid two">
@@ -196,7 +196,7 @@ def records():
     <section class="panel table-panel">
       <table>
         <thead><tr><th>地区</th><th>年份</th><th>总人口</th><th>男性</th><th>女性</th><th>出生率</th><th>死亡率</th><th>自然增长率</th><th>老龄化率</th><th>城镇化率</th><th>操作</th></tr></thead>
-        <tbody>{% for row in rows %}<tr><td>{{ row.region }}</td><td>{{ row.year }}</td><td>{{ row.total_population }}</td><td>{{ row.male_population }}</td><td>{{ row.female_population }}</td><td>{{ row.birth_rate }}%</td><td>{{ row.death_rate }}%</td><td class="{{ 'bad' if row.natural_growth_rate < 0 else 'good' }}">{{ row.natural_growth_rate }}%</td><td>{{ row.aging_rate }}%</td><td>{{ row.urbanization_rate }}%</td><td class="row-actions"><a href="{{ url_for('edit_record', record_id=row.id) }}">编辑</a>{% if current_user.role == 'admin' %}<form method="post" action="{{ url_for('delete_record', record_id=row.id) }}"><button onclick="return confirm('确定删除这条数据吗？')">删除</button></form>{% endif %}</td></tr>{% else %}<tr><td colspan="11" class="empty">没有符合条件的数据。</td></tr>{% endfor %}</tbody>
+        <tbody>{% for row in rows %}<tr><td>{{ row.region }}</td><td>{{ row.year }}</td><td>{{ row.total_population }}</td><td>{{ row.male_population }}</td><td>{{ row.female_population }}</td><td>{{ row.birth_rate }}‰</td><td>{{ row.death_rate }}‰</td><td class="{{ 'bad' if row.natural_growth_rate < 0 else 'good' }}">{{ row.natural_growth_rate }}‰</td><td>{{ row.aging_rate }}%</td><td>{{ row.urbanization_rate }}%</td><td class="row-actions"><a href="{{ url_for('edit_record', record_id=row.id) }}">编辑</a>{% if current_user.role == 'admin' %}<form method="post" action="{{ url_for('delete_record', record_id=row.id) }}"><button onclick="return confirm('确定删除这条数据吗？')">删除</button></form>{% endif %}</td></tr>{% else %}<tr><td colspan="11" class="empty">没有符合条件的数据。</td></tr>{% endfor %}</tbody>
       </table>
     </section>
     """
@@ -212,9 +212,9 @@ RECORD_FORM_TEMPLATE = """
       <label>总人口（万人）<input name="total_population" type="number" min="0" required value="{{ record.total_population if record else '' }}"></label>
       <label>男性人口（万人）<input name="male_population" type="number" min="0" required value="{{ record.male_population if record else '' }}"></label>
       <label>女性人口（万人）<input name="female_population" type="number" min="0" required value="{{ record.female_population if record else '' }}"></label>
-      <label>出生率（%）<input name="birth_rate" type="number" step="0.01" min="0" required value="{{ record.birth_rate if record else '' }}"></label>
-      <label>死亡率（%）<input name="death_rate" type="number" step="0.01" min="0" required value="{{ record.death_rate if record else '' }}"></label>
-      <label>自然增长率（%）<input name="natural_growth_rate" type="number" step="0.01" required value="{{ record.natural_growth_rate if record else '' }}"></label>
+      <label>出生率（‰）<input name="birth_rate" type="number" step="0.01" min="0" required value="{{ record.birth_rate if record else '' }}"></label>
+      <label>死亡率（‰）<input name="death_rate" type="number" step="0.01" min="0" required value="{{ record.death_rate if record else '' }}"></label>
+      <label>自然增长率（‰）<input name="natural_growth_rate" type="number" step="0.01" required value="{{ record.natural_growth_rate if record else '' }}"></label>
       <label>老龄化率（%）<input name="aging_rate" type="number" step="0.01" min="0" required value="{{ record.aging_rate if record else '' }}"></label>
       <label>城镇化率（%）<input name="urbanization_rate" type="number" step="0.01" min="0" required value="{{ record.urbanization_rate if record else '' }}"></label>
       <label>数据来源<input name="source" value="{{ record.source if record else '' }}"></label>
@@ -310,14 +310,14 @@ def global_population():
     <section class="kpis">
       <article><span>最新年份</span><strong>{{ summary.latest_year or '-' }}</strong></article>
       <article><span>国家数量</span><strong>{{ summary.country_count }}</strong></article>
-      <article><span>样本总人口</span><strong>{{ summary.total_population }}</strong><small>万人</small></article>
+      <article><span>总人口</span><strong>{{ summary.total_population }}</strong><small>万人</small></article>
       <article><span>人口最多国家</span><strong>{{ summary.top_country }}</strong></article>
-      <article><span>平均自然增长率</span><strong>{{ summary.avg_growth }}%</strong></article>
+      <article><span>平均自然增长率</span><strong>{{ summary.avg_growth }}‰</strong></article>
       <article><span>平均老龄化率</span><strong>{{ summary.avg_aging }}%</strong></article>
     </section>
     <section class="grid two">
       <div class="panel">
-        <div class="panel-head"><h2>{{ continent or '全球样本' }}人口趋势</h2><span>{{ line.min }} - {{ line.max }} 万人</span></div>
+        <div class="panel-head"><h2>{{ continent or '全球国家' }}人口趋势</h2><span>{{ line.min }} - {{ line.max }} 万人</span></div>
         <svg class="line-chart" viewBox="0 0 720 280" preserveAspectRatio="none">
           <line x1="0" y1="244" x2="720" y2="244"></line><polyline points="{{ line.polyline }}"></polyline>
           {% for item in line.labels %}<text x="{{ item.x }}" y="270">{{ item.label }}</text>{% endfor %}
@@ -333,21 +333,21 @@ def global_population():
         <div class="panel-head"><h2>国家明细</h2></div>
         <table>
           <thead><tr><th>国家</th><th>洲</th><th>年份</th><th>总人口</th><th>出生率</th><th>死亡率</th><th>自然增长率</th><th>老龄化率</th><th>城镇化率</th></tr></thead>
-          <tbody>{% for row in summary.latest %}<tr><td>{{ row.country }}</td><td>{{ row.continent }}</td><td>{{ row.year }}</td><td>{{ row.total_population }}</td><td>{{ row.birth_rate }}%</td><td>{{ row.death_rate }}%</td><td class="{{ 'bad' if row.natural_growth_rate < 0 else 'good' }}">{{ row.natural_growth_rate }}%</td><td>{{ row.aging_rate }}%</td><td>{{ row.urbanization_rate }}%</td></tr>{% endfor %}</tbody>
+          <tbody>{% for row in summary.latest %}<tr><td>{{ row.country }}</td><td>{{ row.continent }}</td><td>{{ row.year }}</td><td>{{ row.total_population }}</td><td>{{ row.birth_rate }}‰</td><td>{{ row.death_rate }}‰</td><td class="{{ 'bad' if row.natural_growth_rate < 0 else 'good' }}">{{ row.natural_growth_rate }}‰</td><td>{{ row.aging_rate }}%</td><td>{{ row.urbanization_rate }}%</td></tr>{% endfor %}</tbody>
         </table>
       </div>
       <div class="panel table-panel">
         <div class="panel-head"><h2>洲际汇总</h2></div>
         <table>
-          <thead><tr><th>洲</th><th>国家数</th><th>样本人口</th><th>平均增长率</th><th>平均老龄化率</th><th>平均城镇化率</th></tr></thead>
-          <tbody>{% for row in summary.continent_summary %}<tr><td>{{ row.continent }}</td><td>{{ row.country_count }}</td><td>{{ row.total_population }}</td><td class="{{ 'bad' if row.avg_growth < 0 else 'good' }}">{{ row.avg_growth }}%</td><td>{{ row.avg_aging }}%</td><td>{{ row.avg_urbanization }}%</td></tr>{% endfor %}</tbody>
+          <thead><tr><th>洲</th><th>国家数</th><th>总人口</th><th>平均增长率</th><th>平均老龄化率</th><th>平均城镇化率</th></tr></thead>
+          <tbody>{% for row in summary.continent_summary %}<tr><td>{{ row.continent }}</td><td>{{ row.country_count }}</td><td>{{ row.total_population }}</td><td class="{{ 'bad' if row.avg_growth < 0 else 'good' }}">{{ row.avg_growth }}‰</td><td>{{ row.avg_aging }}%</td><td>{{ row.avg_urbanization }}%</td></tr>{% endfor %}</tbody>
         </table>
       </div>
     </section>
     """
     return render_page(
         "全球人口统计",
-        "按国家和洲维度统计全球人口样本数据。",
+        "按国家和洲维度统计公开人口数据。",
         "global",
         body,
         summary=summary,
@@ -376,7 +376,7 @@ def comparison():
     bars = build_bars(rows)
     body = """
     <section class="toolbar"><form class="filters" method="get"><select name="year">{% for item in years %}<option value="{{ item }}" {{ 'selected' if item|string == year else '' }}>{{ item }}</option>{% endfor %}</select><div class="check-group">{% for region in regions %}<label><input type="checkbox" name="regions" value="{{ region }}" {{ 'checked' if region in selected else '' }}> {{ region }}</label>{% endfor %}</div><button type="submit">对比</button></form></section>
-    <section class="grid two"><div class="panel"><div class="panel-head"><h2>{{ year }} 年总人口对比</h2></div><div class="bar-list wide">{% for bar in bars %}<div class="bar-row"><span>{{ bar.label }}</span><div><i style="width: {{ bar.width }}%"></i></div><strong>{{ bar.value }}</strong></div>{% endfor %}</div></div><div class="panel table-panel"><table><thead><tr><th>地区</th><th>总人口</th><th>出生率</th><th>自然增长率</th><th>老龄化率</th><th>城镇化率</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.region }}</td><td>{{ row.total_population }}</td><td>{{ row.birth_rate }}%</td><td class="{{ 'bad' if row.natural_growth_rate < 0 else 'good' }}">{{ row.natural_growth_rate }}%</td><td>{{ row.aging_rate }}%</td><td>{{ row.urbanization_rate }}%</td></tr>{% endfor %}</tbody></table></div></section>
+    <section class="grid two"><div class="panel"><div class="panel-head"><h2>{{ year }} 年总人口对比</h2></div><div class="bar-list wide">{% for bar in bars %}<div class="bar-row"><span>{{ bar.label }}</span><div><i style="width: {{ bar.width }}%"></i></div><strong>{{ bar.value }}</strong></div>{% endfor %}</div></div><div class="panel table-panel"><table><thead><tr><th>地区</th><th>总人口</th><th>出生率</th><th>自然增长率</th><th>老龄化率</th><th>城镇化率</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.region }}</td><td>{{ row.total_population }}</td><td>{{ row.birth_rate }}‰</td><td class="{{ 'bad' if row.natural_growth_rate < 0 else 'good' }}">{{ row.natural_growth_rate }}‰</td><td>{{ row.aging_rate }}%</td><td>{{ row.urbanization_rate }}%</td></tr>{% endfor %}</tbody></table></div></section>
     """
     return render_page("地区对比", "选择多个地区，横向比较同一年的人口结构指标。", "comparison", body, regions=get_regions(), years=years, selected=selected, year=year, rows=rows, bars=bars)
 
@@ -415,7 +415,7 @@ def charts():
       <div class="panel"><div class="panel-head"><h2>折线图：总体人口趋势</h2></div><img class="chart-img" src="{{ url_for('static', filename=chart_paths.trend) }}"></div>
       <div class="panel"><div class="panel-head"><h2>柱状图：地区人口排行</h2></div><img class="chart-img" src="{{ url_for('static', filename=chart_paths.ranking) }}"></div>
       <div class="panel"><div class="panel-head"><h2>饼图：性别结构</h2></div><img class="chart-img small-chart" src="{{ url_for('static', filename=chart_paths.gender) }}"></div>
-      <div class="panel"><div class="panel-head"><h2>折线图：全球样本人口趋势</h2></div><img class="chart-img" src="{{ url_for('static', filename=chart_paths['global']) }}"></div>
+      <div class="panel"><div class="panel-head"><h2>折线图：全球国家人口趋势</h2></div><img class="chart-img" src="{{ url_for('static', filename=chart_paths['global']) }}"></div>
       {% endif %}
     </section>
     """
@@ -427,7 +427,7 @@ def charts():
 def alerts():
     rows = get_alerts()
     body = """
-    <section class="panel"><div class="panel-head"><h2>人口风险预警</h2><span>规则：老龄化率 ≥ 20%、自然增长率 &lt; 0、出生率 &lt; 7%</span></div><div class="alert-list">{% for alert in rows %}<article class="alert-card"><strong>{{ alert.region }} · {{ alert.year }}</strong><span class="tag">{{ alert.level }}</span><ul>{% for reason in alert.reasons %}<li>{{ reason }}</li>{% endfor %}</ul><p>{{ alert.suggestion }}</p></article>{% else %}<div class="empty">当前最新年度样本没有触发预警。</div>{% endfor %}</div></section>
+    <section class="panel"><div class="panel-head"><h2>人口风险预警</h2><span>规则：老龄化率 ≥ 20%、自然增长率 &lt; 0、出生率 &lt; 7‰</span></div><div class="alert-list">{% for alert in rows %}<article class="alert-card"><strong>{{ alert.region }} · {{ alert.year }}</strong><span class="tag">{{ alert.level }}</span><ul>{% for reason in alert.reasons %}<li>{{ reason }}</li>{% endfor %}</ul><p>{{ alert.suggestion }}</p></article>{% else %}<div class="empty">当前最新年度数据没有触发预警。</div>{% endfor %}</div></section>
     """
     return render_page("风险预警", "自动识别人口结构和增长风险。", "alerts", body, rows=rows)
 

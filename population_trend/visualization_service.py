@@ -64,9 +64,9 @@ def generate_charts() -> dict[str, str]:
         color="#7c3aed",
         linewidth=2.5,
     )
-    plt.title("全球样本人口变化趋势")
+    plt.title("全球国家人口变化趋势")
     plt.xlabel("年份")
-    plt.ylabel("样本总人口（万人）")
+    plt.ylabel("总人口（万人）")
     plt.grid(alpha=0.25)
     plt.tight_layout()
     plt.savefig(global_path)
